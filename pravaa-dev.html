@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flutter Action Buttons Demo</title>
+  <script src="https://bioseeds.pravaa.com/app/assets/js/tailwindcss.js"></script>
+</head>
+
+<body class="bg-gray-50">
+  <div class="mx-auto max-w-xl p-4">
+    <div class="rounded-lg border border-gray-300 bg-white p-4 shadow-md">
+      <h1 class="text-2xl font-bold text-center text-gray-900">
+        Flutter Action Buttons
+      </h1>
+
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Each button sends event, status_code, message, and action to Flutter.
+      </p>
+
+      <div class="mt-5 space-y-3">
+        <button
+          type="button"
+          onclick="sendMeetingEnded()"
+          class="w-full rounded-md bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-500"
+        >
+          Meeting Ended - Success Message
+        </button>
+
+        <button
+          type="button"
+          onclick="sendMeetingFailed()"
+          class="w-full rounded-md bg-red-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
+        >
+          Meeting Ended - Error Message
+        </button>
+
+        <button
+          type="button"
+          onclick="openFormAdd()"
+          class="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
+        >
+          FORM-181 - Open Form 181 in Add Mode
+        </button>
+
+        <button
+          type="button"
+          onclick="openFormEdit()"
+          class="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
+        >
+          FORM-177:&quot;13&quot; - Open Form 177 in Edit Mode
+        </button>
+
+        <button
+          type="button"
+          onclick="openReport()"
+          class="w-full rounded-md bg-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-500"
+        >
+          REPORT-268 - Open Report 268
+        </button>
+
+        <button
+          type="button"
+          onclick="openReportWithParam()"
+          class="w-full rounded-md bg-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-500"
+        >
+          REPORT-270:&quot;34&quot; - Open Report 270 With Parameter
+        </button>
+
+        <button
+          type="button"
+          onclick="openMenu()"
+          class="w-full rounded-md bg-orange-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
+        >
+          MENU-&quot;My Plan&quot; - Open Menu Item
+        </button>
+      </div>
+
+      <div class="mt-5 rounded-md border border-gray-200 bg-gray-100 p-3">
+        <div class="text-sm font-semibold text-gray-900">Last payload sent:</div>
+        <pre id="payloadPreview" class="mt-2 whitespace-pre-wrap break-words text-xs text-gray-700">No payload sent yet.</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function sendDataToFlutter(data) {
+      const flutterPayload = {
+        event: data.event || "",
+        status_code: data.status_code || "N",
+        message: data.message || "",
+        action: data.action || ""
+      };
+
+      const message = JSON.stringify(flutterPayload);
+
+      document.getElementById("payloadPreview").textContent = JSON.stringify(
+        flutterPayload,
+        null,
+        2
+      );
+
+      // Android WebView JavaScript channel
+      if (window.FlutterChannel && typeof window.FlutterChannel.postMessage === "function") {
+        window.FlutterChannel.postMessage(message);
+        return;
+      }
+
+      // iOS WKWebView JavaScript channel
+      if (
+        window.webkit &&
+        window.webkit.messageHandlers &&
+        window.webkit.messageHandlers.FlutterChannel &&
+        typeof window.webkit.messageHandlers.FlutterChannel.postMessage === "function"
+      ) {
+        window.webkit.messageHandlers.FlutterChannel.postMessage(message);
+        return;
+      }
+
+      // Browser fallback for testing
+      console.log("FlutterChannel not available", flutterPayload);
+    }
+
+    function sendMeetingEnded() {
+      sendDataToFlutter({
+        event: "meeting_ended",
+        status_code: "Y",
+        message: "Meeting ended successfully",
+        action: ""
+      });
+    }
+
+    function sendMeetingFailed() {
+      sendDataToFlutter({
+        event: "meeting_ended",
+        status_code: "N",
+        message: "Unable to end meeting",
+        action: ""
+      });
+    }
+
+    function openFormAdd() {
+      sendDataToFlutter({
+        event: "open_form_add",
+        status_code: "Y",
+        message: "Opening Form 181",
+        action: "FORM-181"
+      });
+    }
+
+    function openFormEdit() {
+      sendDataToFlutter({
+        event: "open_form_edit",
+        status_code: "Y",
+        message: "Opening Form 177 in edit mode",
+        action: 'FORM-177:"13"'
+      });
+    }
+
+    function openReport() {
+      sendDataToFlutter({
+        event: "open_report",
+        status_code: "Y",
+        message: "Opening Report 268",
+        action: "REPORT-268"
+      });
+    }
+
+    function openReportWithParam() {
+      sendDataToFlutter({
+        event: "open_report_with_param",
+        status_code: "Y",
+        message: "Opening Report 270",
+        action: 'REPORT-270:"34"'
+      });
+    }
+
+    function openMenu() {
+      sendDataToFlutter({
+        event: "open_menu",
+        status_code: "Y",
+        message: "Opening My Plan",
+        action: 'MENU-"My Plan"'
+      });
+    }
+  </script>
+</body>
+</html>
